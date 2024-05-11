@@ -8,23 +8,15 @@ from tqdm import tqdm
 from mmseg.apis import init_model, inference_model
 
 DEVICE = torch.device('cuda:0') if torch.cuda.is_available() else torch.device('cpu')
-# 测试图像所在文件夹
-IMAGE_FILE_PATH = r"/home/user4/zjq/dataset_1092(VOC)/VOC2007/1"
-# 模型训练结果的config配置文件路径
-CONFIG = r'/home/user4/zjq/mmsegmentation/tools/work_dirs/swin-tiny/swin-tiny.py'
-# 模型训练结果的权重文件路径
-CHECKPOINT = r'/home/user4/zjq/mmsegmentation/tools/work_dirs/swin-tiny/V13.pth'
-# 模型推理测试结果的保存路径，每个模型的推理结果都保存在`{save_dir}/{模型config同名文件夹}`下，如文末图片所示。
-SAVE_DIR = r"/home/user4/zjq/mmsegmentation/tools/PREDICT"
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Visualize CAM')
-    parser.add_argument('--img', default=IMAGE_FILE_PATH, help='Image file')
-    parser.add_argument('--config', default=CONFIG, help='Config file')
-    parser.add_argument('--checkpoint', default=CHECKPOINT, help='Checkpoint file')
-    parser.add_argument('--device', default=DEVICE, help='device')
-    parser.add_argument('--save_dir', default=SAVE_DIR, help='save_dir')
+    parser.add_argument('--img',  help='Image file')
+    parser.add_argument('--config', help='Config file')
+    parser.add_argument('--checkpoint', help='Checkpoint file')
+    parser.add_argument('--device', help='device')
+    parser.add_argument('--save_dir', help='save_dir')
 
     args = parser.parse_args()
     return args

@@ -1,10 +1,10 @@
 _base_ = [
-    '../_base_/models/myh.py', '../_base_/datasets/pascal_voc12.py',
-    '../_base_/default_runtime.py', '../_base_/schedules/schedule_20k.py'
+    '..configs/_base_/models/taoismnet.py', '..configs/_base_/pascal_voc12.py',
+    '..configs/_base_/default_runtime.py', '..configs/_base_/schedule_20k.py'
 ]
 crop_size = (512, 512)
 data_preprocessor = dict(size=crop_size)
-checkpoint_file = '/home/user4/mmsegmentation/checkpoint/swin_tiny_patch4_window7_224_20220317-1cdeb081.pth'  # noqa
+checkpoint_file = ''  # noqa
 model = dict(
     data_preprocessor=data_preprocessor,
     backbone=dict(

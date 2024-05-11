@@ -1,5 +1,5 @@
 dataset_type = 'PascalVOCDataset'
-data_root = '/home/user4/zjq/dataset_1092(VOC)/VOC2007'
+data_root = ''
 crop_size = (512, 512)
 
 classes=['background','tree']

@@ -1,13 +1,23 @@
+# Copyright (c) OpenMMLab. All rights reserved.
+import argparse
+import os.path as osp
+import time
+
+import numpy as np
+import torch
+from mmengine import Config
+from mmengine.fileio import dump
+from mmengine.model.utils import revert_sync_batchnorm
+from mmengine.registry import init_default_scope
+from mmengine.runner import Runner, load_checkpoint
+from mmengine.utils import mkdir_or_exist
+
+from mmseg.registry import MODELS
+
+
 def parse_args():
-    parser = argparse.ArgumentParser(
-        description='Get the FLOPs and fps of a segmentor')
-    parser.add_argument('config', help='train config file path')
-    parser.add_argument(
-        '--shape',
-        type=int,
-        nargs='+',
-        default=[512, 512],
-        help='input image size')
+    parser = argparse.ArgumentParser(description='MMSeg benchmark a model')
+    parser.add_argument('config', help='test config file path')
     parser.add_argument('checkpoint', help='checkpoint file')
     parser.add_argument(
         '--log-interval', type=int, default=50, help='interval of logging')
@@ -18,51 +28,49 @@ def parse_args():
     parser.add_argument('--repeat-times', type=int, default=1)
     args = parser.parse_args()
     return args
-def get_fps():
-    args = parse_args()
 
+
+def main():
+    args = parse_args()
     cfg = Config.fromfile(args.config)
+
+    init_default_scope(cfg.get('default_scope', 'mmseg'))
+
     timestamp = time.strftime('%Y%m%d_%H%M%S', time.localtime())
     if args.work_dir is not None:
-        mmcv.mkdir_or_exist(osp.abspath(args.work_dir))
+        mkdir_or_exist(osp.abspath(args.work_dir))
         json_file = osp.join(args.work_dir, f'fps_{timestamp}.json')
     else:
         # use config filename as default work_dir if cfg.work_dir is None
         work_dir = osp.join('./work_dirs',
                             osp.splitext(osp.basename(args.config))[0])
-        mmcv.mkdir_or_exist(osp.abspath(work_dir))
+        mkdir_or_exist(osp.abspath(work_dir))
         json_file = osp.join(work_dir, f'fps_{timestamp}.json')
 
     repeat_times = args.repeat_times
     # set cudnn_benchmark
     torch.backends.cudnn.benchmark = False
     cfg.model.pretrained = None
-    cfg.data.test.test_mode = True
 
     benchmark_dict = dict(config=args.config, unit='img / s')
     overall_fps_list = []
+    cfg.test_dataloader.batch_size = 1
     for time_index in range(repeat_times):
         print(f'Run {time_index + 1}:')
         # build the dataloader
-        # TODO: support multiple images per gpu (only minor changes are needed)
-        dataset = build_dataset(cfg.data.test)
-        data_loader = build_dataloader(
-            dataset,
-            samples_per_gpu=1,
-            workers_per_gpu=cfg.data.workers_per_gpu,
-            dist=False,
-            shuffle=False)
+        data_loader = Runner.build_dataloader(cfg.test_dataloader)
 
         # build the model and load checkpoint
         cfg.model.train_cfg = None
-        model = build_segmentor(cfg.model, test_cfg=cfg.get('test_cfg'))
-        fp16_cfg = cfg.get('fp16', None)
-        if fp16_cfg is not None:
-            wrap_fp16_model(model)
+        model = MODELS.build(cfg.model)
+
         if 'checkpoint' in args and osp.exists(args.checkpoint):
             load_checkpoint(model, args.checkpoint, map_location='cpu')
 
-        model = MMDataParallel(model, device_ids=[0])
+        if torch.cuda.is_available():
+            model = model.cuda()
+
+        model = revert_sync_batchnorm(model)
 
         model.eval()
 
@@ -71,16 +79,20 @@ def get_fps():
         pure_inf_time = 0
         total_iters = 200
 
-        # benchmark with 200 image and take the average
+        # benchmark with 200 batches and take the average
         for i, data in enumerate(data_loader):
-
-            torch.cuda.synchronize()
+            data = model.data_preprocessor(data, True)
+            inputs = data['inputs']
+            data_samples = data['data_samples']
+            if torch.cuda.is_available():
+                torch.cuda.synchronize()
             start_time = time.perf_counter()
 
             with torch.no_grad():
-                model(return_loss=False, rescale=True, **data)
+                model(inputs, data_samples, mode='predict')
 
-            torch.cuda.synchronize()
+            if torch.cuda.is_available():
+                torch.cuda.synchronize()
             elapsed = time.perf_counter() - start_time
 
             if i >= num_warmup:
@@ -102,4 +114,8 @@ def get_fps():
           f'{benchmark_dict["average_fps"]}')
     print(f'The variance of {repeat_times} evaluations: '
           f'{benchmark_dict["fps_variance"]}')
-    mmcv.dump(benchmark_dict, json_file, indent=4)
+    dump(benchmark_dict, json_file, indent=4)
+
+
+if __name__ == '__main__':
+    main()
