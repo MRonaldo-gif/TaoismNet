@@ -107,4 +107,4 @@ industrial deployment,for example UAVs in precision agriculture.*</font>
 
 - The work was supported by the Key-Area Research and DevelopmentProgram of Guangdong Province(2023B0202090001);Key Research and Development Program of Guangzhou(2023B03J1392); The National Natural Science Foundation of China (42061046); The special projects in
 key fields of ordinary universities in Guangdong Province (2021ZDZX4111) .
-- This repository have used codes from [OpenMMLab](https://openmmlab.com/) and  [OpenMMLab](https://openmmlab.com/) 
+- This repository have used codes from [OpenMMLab](https://openmmlab.com/) and  [mmsegmentation](https://github.com/open-mmlab/mmsegmentation)
