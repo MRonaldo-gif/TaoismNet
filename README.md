@@ -105,5 +105,6 @@ industrial deployment,for example UAVs in precision agriculture.*</font>
 
 ## Acknowledgements
 
-- The work was supported by the National Science Foundation of China (62076162), and the Shanghai Municipal Science and Technology Major/Key Project, China (2021SHZDZX0102, 20511100300).
-- This repository have used codes from [StyleGAN-ADA](https://github.com/NVlabs/stylegan2-ada-pytorch) and [LPIPS](https://github.com/richzhang/PerceptualSimilarity).
+- The work was supported by This work was supported by the Key-Area Research and DevelopmentProgram of Guangdong Province(2023B0202090001);Key Research and Development Program of Guangzhou(2023B03J1392); The National Natural Science Foundation of China (42061046); The special projects in
+key fields of ordinary universities in Guangdong Province (2021ZDZX4111) .
+- This repository have used codes from [OpenMMLab](https://openmmlab.com/) and [mmsegmentation]([https://github.com/richzhang/PerceptualSimilarity](https://github.com/open-mmlab/mmsegmentation)).
