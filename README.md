@@ -75,7 +75,7 @@ industrial deployment,for example UAVs in precision agriculture.*</font>
     # --show: show prediction results
     # --show-dir: directory where painted images will be saved
     ```
-## Inference: Defect Image Generation
+## Inference
 
 - Use the model to inference
     ```shell
