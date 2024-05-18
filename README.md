@@ -5,7 +5,7 @@
 This repository is the official implementation of the following paper:
 
 > **TaoismNet:A Fruiter Segmentation Model Based on Minimalism**<br>
-> [Yanheng Mai](https://github.com/MRonaldo-gif), [Jiaqi Zheng](https://github.com/kidous2333), [Zefeng Luo](), [Jianqiang Lu](),[Chaoran Yu](),[Caili Yu](),[Zuanhui Lin]()，[Zhongliang Liao]()
+> [Yanheng Mai](https://github.com/MRonaldo-gif), [Jiaqi Zheng](https://github.com/kidous2333), [Zefeng Luo](), [Jianqiang Lu](),[Chaoran Yu](),[Caili Yu](),[Zuanhui Lin](),[Zhongliang Liao]()
 
 > 
 > > **Abstract**<br>
